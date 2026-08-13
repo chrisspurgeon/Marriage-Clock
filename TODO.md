@@ -1,5 +1,7 @@
 # TO DO
 
+[X] Get GPS working
+
 [ ] Boot up messaging
 
 [ ] Loop message while waiting for GPS to connect
