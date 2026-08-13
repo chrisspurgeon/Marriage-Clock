@@ -14,12 +14,13 @@
 #include <Adafruit_GPS.h>
 #include <SoftwareSerial.h>
 
-// DAVES MOD - Start //
-
 Adafruit_GPS GPS(&Serial1);
 HardwareSerial mySerial = Serial1;
 
-// DAVES MOD - END //
+// GPS wiring
+// VIN gets 5V
+// TX on the GPS unit goes to RX1 (PIN 19) on the MEGA
+// RX on the GPS unit goes to TX1 (PIN 18) on the MEGA
 
 
 
