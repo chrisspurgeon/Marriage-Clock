@@ -2,7 +2,9 @@
 
 [X] Get GPS working
 
-[ ] Boot up messaging
+[X] Get displays working
+
+[X] Boot up messaging
 
 [ ] Loop message while waiting for GPS to connect
 

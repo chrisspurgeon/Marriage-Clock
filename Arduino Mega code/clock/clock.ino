@@ -1,28 +1,19 @@
-// Test code for Adafruit GPS modules using MTK3329/MTK3339 driver
-//
-// This code shows how to listen to the GPS module in an interrupt
-// which allows the program to have more 'freedom' - just parse
-// when a new NMEA sentence is available! Then access data when
-// desired.
-//
-// Tested and works great with the Adafruit Ultimate GPS module
-// using MTK33x9 chipset
-//    ------> http://www.adafruit.com/products/746
-// Pick one up today at the Adafruit electronics shop 
-// and help support open source hardware & software! -ada
 
 #include <Adafruit_GPS.h>
 #include <SoftwareSerial.h>
+#include <Wire.h>
+#include <SparkFun_Alphanumeric_Display.h>
+
+
 
 Adafruit_GPS GPS(&Serial1);
 HardwareSerial mySerial = Serial1;
+HT16K33 display;
 
 // GPS wiring
 // VIN gets 5V
 // TX on the GPS unit goes to RX1 (PIN 19) on the MEGA
 // RX on the GPS unit goes to TX1 (PIN 18) on the MEGA
-
-
 
 // Set GPSECHO to 'false' to turn off echoing the GPS data to the Serial console
 // Set to 'true' if you want to debug and listen to the raw GPS sentences. 
@@ -33,13 +24,31 @@ HardwareSerial mySerial = Serial1;
 boolean usingInterrupt = false;
 void useInterrupt(boolean); // Func prototype keeps Arduino 0023 happy
 
+
+// DISPLAY WIRING
+Black wire goes to GND
+Red wire goes to 5V
+Blue wire goes to SDA (PIN 20)
+Yellow wire goes to SCL (PIN 21)
+
+
+
+// Diaplay variables
+String titleString;
+String durationString;
+String padding = "                ";
+String displayString;
+
+
+
+
+
 void setup()  
 {
     
   // connect at 115200 so we can read the GPS fast enough and echo without dropping chars
   // also spit it out
   Serial.begin(115200);
-  Serial.println("Adafruit GPS library basic test!");
 
   // 9600 NMEA is the default baud rate for Adafruit MTK GPS's- some use 4800
   GPS.begin(9600);
@@ -64,9 +73,45 @@ void setup()
   // loop code a heck of a lot easier!
   useInterrupt(true);
 
+// SET UP DISPLAY CONNECTIONS
+  Wire.begin(); //Join I2C bus
+
+  //check if displays will acknowledge
+//  if (display.begin(0x70) == false)
+//  if (display.begin(0x70, 0x71) == false)
+//  if (display.begin(0x70, 0x71, 0x72) == false)
+  if (display.begin(0x70, 0x71, 0x72, 0x73) == false) {
+    Serial.println("Device did not acknowledge! Freezing.");
+    while(1);
+  }
+  Serial.println("Displays acknowledged.");
+
+  display.setBrightness(1);  //14
+
+
+
   delay(1000);
   // Ask for firmware version
   mySerial.println(PMTK_Q_RELEASE);
+
+  titleString = padding + "MARRIAGE CLOCK" + padding + "DESIGNED AND BUILT IN AUGUST 2026 BY CHRIS SPURGEON" + padding;
+  int titleStringLength = titleString.length();
+  for (int i = 0; i < titleStringLength - 15; i++) {
+    displayString = titleString.substring(i, i + 16);
+    display.print(displayString);
+    delay(100);
+  }
+  for (int i=0; i < 5; i++) {
+    titleString = "  INITIALIZING:";
+    display.print(titleString);
+    delay(500);
+    titleString = "  INITIALIZING";
+    display.print(titleString);
+    delay(500);
+  }
+
+
+
 }
 
 
