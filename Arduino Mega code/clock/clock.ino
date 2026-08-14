@@ -17,7 +17,7 @@ HT16K33 display;
 
 // Set GPSECHO to 'false' to turn off echoing the GPS data to the Serial console
 // Set to 'true' if you want to debug and listen to the raw GPS sentences. 
-#define GPSECHO  true
+#define GPSECHO  false
 
 // this keeps track of whether we're using the interrupt
 // off by default!
@@ -26,10 +26,10 @@ void useInterrupt(boolean); // Func prototype keeps Arduino 0023 happy
 
 
 // DISPLAY WIRING
-Black wire goes to GND
-Red wire goes to 5V
-Blue wire goes to SDA (PIN 20)
-Yellow wire goes to SCL (PIN 21)
+// Black wire goes to GND
+// Red wire goes to 5V
+// Blue wire goes to SDA (PIN 20)
+// Yellow wire goes to SCL (PIN 21)
 
 
 
@@ -150,8 +150,11 @@ void loop()                     // run over and over again
     // read data from the GPS in the 'main loop'
     char c = GPS.read();
     // if you want to debug, this is a good time to do it!
-    if (GPSECHO)
-      if (c) Serial.print(c);
+    //  if (GPSECHO) {
+    //    if (c) {
+    //     Serial.print(c);
+    //    }
+    //  }
   }
   
   // if a sentence is received, we can check the checksum, parse it...
@@ -185,17 +188,17 @@ void loop()                     // run over and over again
     Serial.print(" quality: "); Serial.println((int)GPS.fixquality); 
     if (GPS.fix) {
       Serial.print("Location: ");
-      Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
-      Serial.print(", "); 
-      Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
+//      Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
+//      Serial.print(", "); 
+//      Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
       Serial.print("Location (in degrees, works with Google Maps): ");
       Serial.print(GPS.latitudeDegrees, 6);
       Serial.print(", "); 
       Serial.println(GPS.longitudeDegrees, 6);
       
-      Serial.print("Speed (knots): "); Serial.println(GPS.speed);
-      Serial.print("Angle: "); Serial.println(GPS.angle);
-      Serial.print("Altitude: "); Serial.println(GPS.altitude);
+//      Serial.print("Speed (knots): "); Serial.println(GPS.speed);
+//      Serial.print("Angle: "); Serial.println(GPS.angle);
+//      Serial.print("Altitude: "); Serial.println(GPS.altitude);
       Serial.print("Satellites: "); Serial.println((int)GPS.satellites);
     }
   }
