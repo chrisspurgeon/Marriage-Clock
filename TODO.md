@@ -12,6 +12,6 @@
 
 [ ] Fallback when GPS signal is lost
 
-[ ] Brightness control
+[X] Brightness control
 
-[ ] Text speed control
+[X] Text speed control
