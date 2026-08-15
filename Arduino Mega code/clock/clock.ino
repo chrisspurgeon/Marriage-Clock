@@ -118,15 +118,6 @@ void setup() {
   useInterrupt(true);
 
   delay(2000);
-  Serial.println("THIS IS clock!");
-  Serial.println(minutesLength);
-  Serial.println(hoursLength);
-  Serial.println(daysLength);
-  Serial.println(weeksLength);
-  Serial.println(fortnightsLength);
-  Serial.println(yearsLength);
-  Serial.println(decadesLength);
-  Serial.println(centuriesLength);
 
 
   // SET UP DISPLAY CONNECTIONS
@@ -308,17 +299,15 @@ void loop()  // run over and over again
     delay(4000);
   }
 
+
+
+
+
 /*
       MAIN DISPLAY
       If we're here, we have the correct time and can start the duration displays.
 
 */
-
-  CURRENTTIME = convertToUnixTimeLib(testCurrentYear, testCurrentMonth, testCurrentDay, testCurrentHour, testCurrentMinute, testCurrentSecond);
-//  CURRENTTIME = double(t);
-  Serial.print("\nThe current time is ");
-//  Serial.println(t);
-  Serial.println(CURRENTTIME);
 
 
 
@@ -330,6 +319,15 @@ void loop()  // run over and over again
   // approximately every 2 seconds or so, print out the current stats
   if (millis() - timer > 2000) {
     timer = millis();  // reset the timer
+  Serial.println("Right before I call convertToUnixTimeLib() I think the year is...");
+  Serial.println(GPS.year);
+  CURRENTTIME = convertToUnixTimeLib(int(GPS.year) + 2000, int(GPS.month), int(GPS.day), int(GPS.hour), int(GPS.minute), int(GPS.seconds));
+  Serial.print("\nThe current time is ");
+  Serial.println(CURRENTTIME);
+
+
+
+
 
     Serial.print("\nTime: ");
     Serial.print(GPS.hour, DEC);
@@ -366,7 +364,7 @@ void loop()  // run over and over again
       Serial.println((int)GPS.satellites);
     }
   }
-}
+}  // end of loop()
 
 void displayMessage(String theMessage, int scroll) {
   if (scroll) {
@@ -389,6 +387,8 @@ void displayMessage(String theMessage, int scroll) {
 
 
 unsigned long convertToUnixTimeLib(int year, int month, int day, int hour, int minute, int second) {
+  Serial.println("Right at the top of convertToUnixTimeLib() the year is...");
+  Serial.println(year);
   tmElements_t tm;
   
   tm.Year = CalendarYrToTm(year); // Converts standard year to offset from 1970
@@ -398,7 +398,14 @@ unsigned long convertToUnixTimeLib(int year, int month, int day, int hour, int m
   tm.Minute = minute;
   tm.Second = second;
   Serial.println("Inside convertToUnixTimeLib...");
+  Serial.println(year);
+  Serial.println(CalendarYrToTm(year));
   Serial.println(makeTime(tm));
+  Serial.println(month);
+  Serial.println(day);
+  Serial.println(hour);
+  Serial.println(minute);
+  Serial.println(second);
   return makeTime(tm); // Returns time_t (Unix timestamp)
 }
 
