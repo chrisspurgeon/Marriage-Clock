@@ -33,10 +33,10 @@ void useInterrupt(boolean);  // Func prototype keeps Arduino 0023 happy
 
 
 // Diaplay variables
-String titleString;
-String durationString;
-String padding = "                ";  // 16 spaces
+String textString;
 String displayString;
+String padding = "                ";  // 16 spaces
+int textStringLength = 0;
 
 // Brightness and speed variables
 int brightnessPin = A0;  // select the input pin for the potentiometer
@@ -44,7 +44,9 @@ int speedPin = A1;       // select the input pin for the potentiometer
 int brightness = 4;      // variable to store the value coming from the sensor
 int speed = 500;         // variable to store the value coming from the sensor
 
-
+// GPS lock variables
+int lastGPSlock = 0;
+int currentGPSlock = 0;
 
 
 
@@ -109,10 +111,14 @@ void setup() {
 
   */
 
-  titleString = padding + "MARRIAGE CLOCK" + padding + "DESIGNED AND BUILT IN AUGUST 2026 BY CHRIS SPURGEON" + padding;
-  int titleStringLength = titleString.length();
-  for (int i = 0; i < titleStringLength - 15; i++) {
-    displayString = titleString.substring(i, i + 16);
+  textString = padding + "MARRIAGE CLOCK" + padding + "DESIGNED AND BUILT IN AUGUST 2026 BY CHRIS SPURGEON" + padding;
+  Serial.print("Right now I thing displayString is ");
+  Serial.println(textString);
+  textStringLength = textString.length();
+  Serial.print("and I think the length is ");
+  Serial.println(textStringLength);
+  for (int i = 0; i < textStringLength - 15; i++) {
+    displayString = textString.substring(i, i + 16);
     brightness = map(analogRead(brightnessPin), 0, 1024, 0, 16);
     speed = map(analogRead(speedPin), 0, 1024, 400, 10);
     Serial.println(brightness);
@@ -121,11 +127,11 @@ void setup() {
     delay(speed);
   }
   for (int i = 0; i < 5; i++) {
-    titleString = "  INITIALIZING:";
-    display.print(titleString);
+    textString = "  INITIALIZING:";
+    display.print(textString);
     delay(500);
-    titleString = "  INITIALIZING";
-    display.print(titleString);
+    textString = "  INITIALIZING";
+    display.print(textString);
     delay(500);
   }
 }  // END OF setup()
@@ -201,6 +207,20 @@ void loop()  // run over and over again
 
   // if millis() or timer wraps around, we'll just reset it
   if (timer > millis()) timer = millis();
+
+
+  // Set GPS fix status
+
+  if ((int)GPS.fixquality != 0 && (int)GPS.fix != 0 && (int)GPS.satellites != 0) {
+    currentGPSlock = 1;
+  } else {
+    currentGPSlock = 0;
+    lastGPSlock = 0;
+  }
+
+
+
+
 
   // approximately every 2 seconds or so, print out the current stats
   if (millis() - timer > 2000) {
