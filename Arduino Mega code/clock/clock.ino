@@ -3,6 +3,8 @@
 #include <SoftwareSerial.h>
 #include <Wire.h>
 #include <SparkFun_Alphanumeric_Display.h>
+#include <TimeLib.h>  // Include the Time library
+
 
 // GPS wiring
 // VIN gets 5V
@@ -31,7 +33,6 @@ boolean usingInterrupt = false;
 void useInterrupt(boolean);  // Func prototype keeps Arduino 0023 happy
 
 
-
 // Diaplay variables
 String textString;
 String displayString;
@@ -47,6 +48,42 @@ int speed = 500;         // variable to store the value coming from the sensor
 // GPS lock variables
 int lastGPSlock = 0;
 int currentGPSlock = 0;
+
+/*
+
+TIME VARIABLES
+
+*/
+double durationInSeconds;
+double durationInMinutes;
+double durationInHours;
+double durationInDays;
+double durationInWeeks;
+double durationInFortnights;
+double durationInYears;
+double durationInDecades;
+double durationInCenturies;
+
+double minutesLength = 60.0;
+double hoursLength = 3600.0;
+double daysLength = 86400.0;
+double weeksLength = 604800.0;
+double fortnightsLength = 1209600.0;
+double yearsLength = 31556736.0;
+double decadesLength = 315567360.0;
+double centuriesLength = 3155673600.0;
+unsigned long TIMEOFMARRIAGE = 1788642000; // Saturday, September 5, 2026, at 21:00 UTC
+unsigned long DURATION;
+unsigned long CURRENTTIME;
+
+// STATIC VALUES FOR TESTING
+int testCurrentYear = 2029;
+int testCurrentMonth = 4;
+int testCurrentDay = 17;
+int testCurrentHour = 20;
+int testCurrentMinute = 59;
+int testCurrentSecond = 30;
+
 
 
 
@@ -80,7 +117,16 @@ void setup() {
   // loop code a heck of a lot easier!
   useInterrupt(true);
 
-
+  delay(2000);
+  Serial.println("THIS IS clock!");
+  Serial.println(minutesLength);
+  Serial.println(hoursLength);
+  Serial.println(daysLength);
+  Serial.println(weeksLength);
+  Serial.println(fortnightsLength);
+  Serial.println(yearsLength);
+  Serial.println(decadesLength);
+  Serial.println(centuriesLength);
 
 
   // SET UP DISPLAY CONNECTIONS
@@ -262,6 +308,23 @@ void loop()  // run over and over again
     delay(4000);
   }
 
+/*
+      MAIN DISPLAY
+      If we're here, we have the correct time and can start the duration displays.
+
+*/
+
+  CURRENTTIME = convertToUnixTimeLib(testCurrentYear, testCurrentMonth, testCurrentDay, testCurrentHour, testCurrentMinute, testCurrentSecond);
+//  CURRENTTIME = double(t);
+  Serial.print("\nThe current time is ");
+//  Serial.println(t);
+  Serial.println(CURRENTTIME);
+
+
+
+
+
+
 
 
   // approximately every 2 seconds or so, print out the current stats
@@ -321,3 +384,21 @@ void displayMessage(String theMessage, int scroll) {
     display.print(theMessage);
   }
 }
+
+
+
+
+unsigned long convertToUnixTimeLib(int year, int month, int day, int hour, int minute, int second) {
+  tmElements_t tm;
+  
+  tm.Year = CalendarYrToTm(year); // Converts standard year to offset from 1970
+  tm.Month = month;               // Standard Month (1-12)
+  tm.Day = day;                   // Standard Day (1-31)
+  tm.Hour = hour;
+  tm.Minute = minute;
+  tm.Second = second;
+  Serial.println("Inside convertToUnixTimeLib...");
+  Serial.println(makeTime(tm));
+  return makeTime(tm); // Returns time_t (Unix timestamp)
+}
+
