@@ -112,16 +112,16 @@ void setup() {
   */
 
   textString = padding + "MARRIAGE CLOCK" + padding + "DESIGNED AND BUILT IN AUGUST 2026 BY CHRIS SPURGEON" + padding;
-  Serial.print("Right now I thing displayString is ");
-  Serial.println(textString);
+  //  Serial.print("Right now I thing displayString is ");
+  //  Serial.println(textString);
   textStringLength = textString.length();
-  Serial.print("and I think the length is ");
-  Serial.println(textStringLength);
+  //  Serial.print("and I think the length is ");
+  //  Serial.println(textStringLength);
   for (int i = 0; i < textStringLength - 15; i++) {
     displayString = textString.substring(i, i + 16);
     brightness = map(analogRead(brightnessPin), 0, 1024, 0, 16);
     speed = map(analogRead(speedPin), 0, 1024, 400, 10);
-    Serial.println(brightness);
+    //    Serial.println(brightness);
     display.setBrightness(brightness);  //14
     display.print(displayString);
     delay(speed);
@@ -210,15 +210,57 @@ void loop()  // run over and over again
 
 
   // Set GPS fix status
-
-  if ((int)GPS.fixquality != 0 && (int)GPS.fix != 0 && (int)GPS.satellites != 0) {
+  if ((int)GPS.fix != 0 && (int)GPS.satellites != 0) {
     currentGPSlock = 1;
   } else {
     currentGPSlock = 0;
     lastGPSlock = 0;
+    displayMessage(padding + "WAITING FOR CLOCK SIGNAL" + padding, 1);
   }
 
+  // GOT A GOOD FIX. DISPLAY INITIAL DATE AND TIME.
+  if (currentGPSlock == 1 && lastGPSlock == 0) {
+    displayMessage(padding + "BOOYAH -- CLOCK SIGNAL ACQUIRED" + padding, 1);
+    lastGPSlock = 1;
 
+    // DISPLAY INITIAL DATE AND TIME
+    displayMessage("  CURRENT DATE:", 0);
+    delay(2000);
+
+    // DATE
+    if (int(GPS.month) < 10) {
+      textString = "  0" + String(GPS.month) + "-";
+    } else {
+      textString = "  " + String(GPS.month) + "-";
+    }
+    if (int(GPS.day) < 10) {
+      textString += "0" + String(GPS.day) + "-";
+    } else {
+      textString += String(GPS.day) + "-";
+    }
+    textString += String(GPS.year) + " UTC";
+
+    displayMessage(textString, 0);
+    delay(4000);
+
+    // TIME
+    displayMessage("  CURRENT TIME:", 0);
+    delay(2000);
+
+    if (int(GPS.hour) < 10) {
+      textString = "    0" + String(GPS.hour) + ":";
+    } else {
+      textString = "    " + String(GPS.hour) + ":";
+    }
+    if (int(GPS.minute) < 10) {
+      textString += "0" + String(GPS.minute) + " UTC";
+    } else {
+      textString += String(GPS.minute) + " UTC";
+    }
+
+    displayMessage(textString, 0);
+    delay(4000);
+  }
 
 
 
@@ -245,14 +287,14 @@ void loop()  // run over and over again
     Serial.print(" quality: ");
     Serial.println((int)GPS.fixquality);
     if (GPS.fix) {
-      Serial.print("Location: ");
-      //      Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
-      //      Serial.print(", ");
-      //      Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
-      Serial.print("Location (in degrees, works with Google Maps): ");
-      Serial.print(GPS.latitudeDegrees, 6);
-      Serial.print(", ");
-      Serial.println(GPS.longitudeDegrees, 6);
+      //   Serial.print("Location: ");
+      //   //      Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
+      //   //      Serial.print(", ");
+      //   //      Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
+      //   Serial.print("Location (in degrees, works with Google Maps): ");
+      //   Serial.print(GPS.latitudeDegrees, 6);
+      //   Serial.print(", ");
+      //   Serial.println(GPS.longitudeDegrees, 6);
 
       //      Serial.print("Speed (knots): "); Serial.println(GPS.speed);
       //      Serial.print("Angle: "); Serial.println(GPS.angle);
@@ -260,5 +302,22 @@ void loop()  // run over and over again
       Serial.print("Satellites: ");
       Serial.println((int)GPS.satellites);
     }
+  }
+}
+
+void displayMessage(String theMessage, int scroll) {
+  if (scroll) {
+    textString = theMessage;
+    textStringLength = textString.length();
+    for (int i = 0; i < textStringLength - 15; i++) {
+      displayString = textString.substring(i, i + 16);
+      brightness = map(analogRead(brightnessPin), 0, 1024, 0, 16);
+      speed = map(analogRead(speedPin), 0, 1024, 400, 10);
+      display.setBrightness(brightness);  //14
+      display.print(displayString);
+      delay(speed);
+    }
+  } else {
+    display.print(theMessage);
   }
 }
