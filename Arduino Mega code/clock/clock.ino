@@ -24,11 +24,13 @@ HT16K33 display;
 
 // Set GPSECHO to 'false' to turn off echoing the GPS data to the Serial console
 // Set to 'true' if you want to debug and listen to the raw GPS sentences.
+// Set DEBUGGER to 'true' if you want to see the date & time output.
 #define GPSECHO false
+#define DEBUGGER false
 
 // this keeps track of whether we're using the interrupt
 // off by default!
-boolean usingInterrupt = false;
+boolean usingInterrupt = true;
 void useInterrupt(boolean);  // Func prototype keeps Arduino 0023 happy
 
 
@@ -53,15 +55,6 @@ int currentGPSlock = 0;
 TIME VARIABLES
 
 */
-double durationInSeconds;
-double durationInMinutes;
-double durationInHours;
-double durationInDays;
-double durationInWeeks;
-double durationInFortnights;
-double durationInYears;
-double durationInDecades;
-double durationInCenturies;
 
 double minutesLength = 60.0;
 double hoursLength = 3600.0;
@@ -129,7 +122,7 @@ void setup() {
 
   delay(1000);
   // Ask for firmware version
-  mySerial.println(PMTK_Q_RELEASE);
+  //mySerial.println(PMTK_Q_RELEASE);
 
 
 
@@ -289,31 +282,66 @@ void loop()  // run over and over again
   }
 
   if (currentGPSlock == 1) {
-  /*
+    /*
       MAIN DISPLAY
       If we're here, we have the correct time and can start the duration displays.
   */
-  Serial.println("CURRENT_TIME is ");
-  Serial.println(CURRENT_TIME);
-  Serial.println("TIME_OF_MARRIAGE is");
-  Serial.println(TIME_OF_MARRIAGE);
-  CURRENT_WEDDING_DURATION = CURRENT_TIME - TEST_TIME_OF_MARRIAGE;
-  Serial.println("CURRENT_WEDDING_DURATION is");
-  Serial.println(CURRENT_WEDDING_DURATION);
-  DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / weeksLength;
-  DURATION_IN_UNITS_string = String(DURATION_IN_UNITS);
-  DURATION_IN_UNITS_string.replace(".", "-POINT-");
-  displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " WEEKS" + padding, 1);
 
-  DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / decadesLength;
-  DURATION_IN_UNITS_string = String(DURATION_IN_UNITS,6);
-  DURATION_IN_UNITS_string.replace(".", "-POINT-");
-  displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " DECADES" + padding, 1);
+  /* WEEKS */
+    CURRENT_WEDDING_DURATION = CURRENT_TIME - TEST_TIME_OF_MARRIAGE;
+    DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / weeksLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS);
+    DURATION_IN_UNITS_string.replace(".", "-POINT-");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " WEEKS" + padding, 1);
 
-  DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / centuriesLength;
-  DURATION_IN_UNITS_string = String(DURATION_IN_UNITS,6);
-  DURATION_IN_UNITS_string.replace(".", "-POINT-");
-  displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " CENTURIES" + padding, 1);
+  /* DECADES */
+    DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / decadesLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+    DURATION_IN_UNITS_string.replace(".", "-POINT-");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " DECADES" + padding, 1);
+
+  /* FORTNIGHTS */
+    DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / fortnightsLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+    DURATION_IN_UNITS_string.replace(".", "-POINT-");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " FORTNIGHTS" + padding, 1);
+
+  /* CENTURIES */
+    DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / centuriesLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+    DURATION_IN_UNITS_string.replace(".", "-POINT-");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " CENTURIES" + padding, 1);
+
+  /* SECONDS */
+    DURATION_IN_UNITS = CURRENT_WEDDING_DURATION;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS);
+    DURATION_IN_UNITS_string.replace(".", "");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " SECONDS" + padding, 1);
+
+  /* MINUTES */
+    DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / minutesLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+    DURATION_IN_UNITS_string.replace(".", "-POINT-");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " MINUTES" + padding, 1);
+
+  /* HOURS */
+    DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / hoursLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+    DURATION_IN_UNITS_string.replace(".", "-POINT-");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " HOURS" + padding, 1);  /* MINUTES */
+
+  /* DAYS */
+    DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / daysLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+    DURATION_IN_UNITS_string.replace(".", "-POINT-");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " DAYS" + padding, 1);
+
+  /* YEARS */
+    DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / yearsLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+    DURATION_IN_UNITS_string.replace(".", "-POINT-");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " YEARS" + padding, 1);
+
 
   }
 
@@ -324,43 +352,45 @@ void loop()  // run over and over again
   if (millis() - timer > 2000) {
     timer = millis();  // reset the timer
     CURRENT_TIME = convertToUnixTimeLib(int(GPS.year) + 2000, int(GPS.month), int(GPS.day), int(GPS.hour), int(GPS.minute), int(GPS.seconds));
-    Serial.print("\nThe current time is ");
-    Serial.println(CURRENT_TIME);
+    if (DEBUGGER) {
+      Serial.print("\nThe current time is ");
+      Serial.println(CURRENT_TIME);
 
-    Serial.print("\nTime: ");
-    Serial.print(GPS.hour, DEC);
-    Serial.print(':');
-    Serial.print(GPS.minute, DEC);
-    Serial.print(':');
-    Serial.print(GPS.seconds, DEC);
-    Serial.print('.');
-    Serial.println(GPS.milliseconds);
-    Serial.print("Date: ");
-    Serial.print(GPS.day, DEC);
-    Serial.print('/');
-    Serial.print(GPS.month, DEC);
-    Serial.print("/20");
-    Serial.println(GPS.year, DEC);
-    Serial.print("Fix: ");
-    Serial.print((int)GPS.fix);
-    Serial.print(" quality: ");
-    Serial.println((int)GPS.fixquality);
-    if (GPS.fix) {
-      //   Serial.print("Location: ");
-      //   //      Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
-      //   //      Serial.print(", ");
-      //   //      Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
-      //   Serial.print("Location (in degrees, works with Google Maps): ");
-      //   Serial.print(GPS.latitudeDegrees, 6);
-      //   Serial.print(", ");
-      //   Serial.println(GPS.longitudeDegrees, 6);
+      Serial.print("\nTime: ");
+      Serial.print(GPS.hour, DEC);
+      Serial.print(':');
+      Serial.print(GPS.minute, DEC);
+      Serial.print(':');
+      Serial.print(GPS.seconds, DEC);
+      Serial.print('.');
+      Serial.println(GPS.milliseconds);
+      Serial.print("Date: ");
+      Serial.print(GPS.day, DEC);
+      Serial.print('/');
+      Serial.print(GPS.month, DEC);
+      Serial.print("/20");
+      Serial.println(GPS.year, DEC);
+      Serial.print("Fix: ");
+      Serial.print((int)GPS.fix);
+      Serial.print(" quality: ");
+      Serial.println((int)GPS.fixquality);
+      if (GPS.fix) {
+        //   Serial.print("Location: ");
+        //   //      Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
+        //   //      Serial.print(", ");
+        //   //      Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
+        //   Serial.print("Location (in degrees, works with Google Maps): ");
+        //   Serial.print(GPS.latitudeDegrees, 6);
+        //   Serial.print(", ");
+        //   Serial.println(GPS.longitudeDegrees, 6);
 
-      //      Serial.print("Speed (knots): "); Serial.println(GPS.speed);
-      //      Serial.print("Angle: "); Serial.println(GPS.angle);
-      //      Serial.print("Altitude: "); Serial.println(GPS.altitude);
-      Serial.print("Satellites: ");
-      Serial.println((int)GPS.satellites);
-    }
+        //      Serial.print("Speed (knots): "); Serial.println(GPS.speed);
+        //      Serial.print("Angle: "); Serial.println(GPS.angle);
+        //      Serial.print("Altitude: "); Serial.println(GPS.altitude);
+        Serial.print("Satellites: ");
+        Serial.println((int)GPS.satellites);
+      }  // end GPS.fix
+    } // end DEBUGGER
   }
 }  // end of loop()
 
@@ -383,8 +413,6 @@ void displayMessage(String theMessage, int scroll) {
 
 
 unsigned long convertToUnixTimeLib(int year, int month, int day, int hour, int minute, int second) {
-  Serial.println("Right at the top of convertToUnixTimeLib() the year is...");
-  Serial.println(year);
   tmElements_t tm;
 
   tm.Year = CalendarYrToTm(year);  // Converts standard year to offset from 1970
