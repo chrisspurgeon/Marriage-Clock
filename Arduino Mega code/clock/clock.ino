@@ -1,4 +1,3 @@
-
 #include <Adafruit_GPS.h>
 #include <SoftwareSerial.h>
 #include <Wire.h>
@@ -72,20 +71,12 @@ double fortnightsLength = 1209600.0;
 double yearsLength = 31556736.0;
 double decadesLength = 315567360.0;
 double centuriesLength = 3155673600.0;
-unsigned long TIMEOFMARRIAGE = 1788642000; // Saturday, September 5, 2026, at 21:00 UTC
-unsigned long DURATION;
-unsigned long CURRENTTIME;
-
-// STATIC VALUES FOR TESTING
-int testCurrentYear = 2029;
-int testCurrentMonth = 4;
-int testCurrentDay = 17;
-int testCurrentHour = 20;
-int testCurrentMinute = 59;
-int testCurrentSecond = 30;
-
-
-
+unsigned long TIME_OF_MARRIAGE = 1788642000L;      // Saturday, September 5, 2026, at 21:00 UTC
+unsigned long TEST_TIME_OF_MARRIAGE = 674774091L;  // Friday, May 19, 1991, at 21:14:51 UTC
+unsigned long CURRENT_WEDDING_DURATION;
+unsigned long CURRENT_TIME;
+double DURATION_IN_UNITS;
+String DURATION_IN_UNITS_string;
 
 
 void setup() {
@@ -149,11 +140,7 @@ void setup() {
   */
 
   textString = padding + "MARRIAGE CLOCK" + padding + "DESIGNED AND BUILT IN AUGUST 2026 BY CHRIS SPURGEON" + padding;
-  //  Serial.print("Right now I thing displayString is ");
-  //  Serial.println(textString);
   textStringLength = textString.length();
-  //  Serial.print("and I think the length is ");
-  //  Serial.println(textStringLength);
   for (int i = 0; i < textStringLength - 15; i++) {
     displayString = textString.substring(i, i + 16);
     brightness = map(analogRead(brightnessPin), 0, 1024, 0, 16);
@@ -253,6 +240,8 @@ void loop()  // run over and over again
     currentGPSlock = 0;
     lastGPSlock = 0;
     displayMessage(padding + "WAITING FOR CLOCK SIGNAL" + padding, 1);
+    displayMessage(padding + "THIS MAY TAKE SEVERAL MINUTES" + padding, 1);
+    delay(2100);
   }
 
   // GOT A GOOD FIX. DISPLAY INITIAL DATE AND TIME.
@@ -299,19 +288,34 @@ void loop()  // run over and over again
     delay(4000);
   }
 
-
-
-
-
-/*
+  if (currentGPSlock == 1) {
+  /*
       MAIN DISPLAY
       If we're here, we have the correct time and can start the duration displays.
+  */
+  Serial.println("CURRENT_TIME is ");
+  Serial.println(CURRENT_TIME);
+  Serial.println("TIME_OF_MARRIAGE is");
+  Serial.println(TIME_OF_MARRIAGE);
+  CURRENT_WEDDING_DURATION = CURRENT_TIME - TEST_TIME_OF_MARRIAGE;
+  Serial.println("CURRENT_WEDDING_DURATION is");
+  Serial.println(CURRENT_WEDDING_DURATION);
+  DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / weeksLength;
+  DURATION_IN_UNITS_string = String(DURATION_IN_UNITS);
+  DURATION_IN_UNITS_string.replace(".", "-POINT-");
+  displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " WEEKS" + padding, 1);
 
-*/
+  DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / decadesLength;
+  DURATION_IN_UNITS_string = String(DURATION_IN_UNITS,6);
+  DURATION_IN_UNITS_string.replace(".", "-POINT-");
+  displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " DECADES" + padding, 1);
 
+  DURATION_IN_UNITS = CURRENT_WEDDING_DURATION / centuriesLength;
+  DURATION_IN_UNITS_string = String(DURATION_IN_UNITS,6);
+  DURATION_IN_UNITS_string.replace(".", "-POINT-");
+  displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " CENTURIES" + padding, 1);
 
-
-
+  }
 
 
 
@@ -319,15 +323,9 @@ void loop()  // run over and over again
   // approximately every 2 seconds or so, print out the current stats
   if (millis() - timer > 2000) {
     timer = millis();  // reset the timer
-  Serial.println("Right before I call convertToUnixTimeLib() I think the year is...");
-  Serial.println(GPS.year);
-  CURRENTTIME = convertToUnixTimeLib(int(GPS.year) + 2000, int(GPS.month), int(GPS.day), int(GPS.hour), int(GPS.minute), int(GPS.seconds));
-  Serial.print("\nThe current time is ");
-  Serial.println(CURRENTTIME);
-
-
-
-
+    CURRENT_TIME = convertToUnixTimeLib(int(GPS.year) + 2000, int(GPS.month), int(GPS.day), int(GPS.hour), int(GPS.minute), int(GPS.seconds));
+    Serial.print("\nThe current time is ");
+    Serial.println(CURRENT_TIME);
 
     Serial.print("\nTime: ");
     Serial.print(GPS.hour, DEC);
@@ -384,28 +382,16 @@ void displayMessage(String theMessage, int scroll) {
 }
 
 
-
-
 unsigned long convertToUnixTimeLib(int year, int month, int day, int hour, int minute, int second) {
   Serial.println("Right at the top of convertToUnixTimeLib() the year is...");
   Serial.println(year);
   tmElements_t tm;
-  
-  tm.Year = CalendarYrToTm(year); // Converts standard year to offset from 1970
-  tm.Month = month;               // Standard Month (1-12)
-  tm.Day = day;                   // Standard Day (1-31)
+
+  tm.Year = CalendarYrToTm(year);  // Converts standard year to offset from 1970
+  tm.Month = month;                // Standard Month (1-12)
+  tm.Day = day;                    // Standard Day (1-31)
   tm.Hour = hour;
   tm.Minute = minute;
   tm.Second = second;
-  Serial.println("Inside convertToUnixTimeLib...");
-  Serial.println(year);
-  Serial.println(CalendarYrToTm(year));
-  Serial.println(makeTime(tm));
-  Serial.println(month);
-  Serial.println(day);
-  Serial.println(hour);
-  Serial.println(minute);
-  Serial.println(second);
-  return makeTime(tm); // Returns time_t (Unix timestamp)
+  return makeTime(tm);  // Returns time_t (Unix timestamp)
 }
-
