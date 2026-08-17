@@ -74,6 +74,7 @@ String DURATION_IN_UNITS_string;
 
 /* DEBUGGER */
 bool DEBUGGER_FLAG;
+bool TEST_DATE_FLAG;
 
 void setup() {
 
@@ -88,12 +89,20 @@ void setup() {
   /* Set digitalpin 7 as the debugger switch. Short the pin to GND to turn on debugging */
   pinMode(7, INPUT_PULLUP);
 
+  /* Set digitalpin 8 to use Chris and Barb's wedding date. */
+  pinMode(8, INPUT_PULLUP);
+
   DEBUGGER_FLAG = !digitalRead(7);
   Serial.print("DEBUGGING PIN IS ");
   Serial.println(DEBUGGER_FLAG);
 
 
-  if (DEBUGGER_FLAG) {
+  TEST_DATE_FLAG = !digitalRead(8);
+  Serial.print("TEST DATE DEBUGGER PIN IS ");
+  Serial.println(TEST_DATE_FLAG);
+
+
+  if (TEST_DATE_FLAG) {
     Serial.println("CHECK 1");
     Serial.println(TIME_OF_MARRIAGE);
     TIME_OF_MARRIAGE = TEST_TIME_OF_MARRIAGE;
