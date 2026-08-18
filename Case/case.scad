@@ -18,8 +18,9 @@ difference() {
         scale([127, 27, 1])
             cylinder(h = 88, r = 1);
     
-    translate([-165/2,-20/2,-1])
-    cube([165,20,5]);
+    // display opening
+    translate([-165/2,-17/2,-1])
+    cube([165,17,5]);
 
 // tuner holes
 translate([107,0,-1])
@@ -60,7 +61,7 @@ cube([6,15,90]);
 
 
 
-    // 165 x 20 (30 total height)
+    // 165 x 17 (30 total height)
 
 
 
