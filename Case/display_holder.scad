@@ -1,7 +1,17 @@
 $fn=20;
 
+
+
+color("yellow")
+translate([25,0,0])
+cube([170,28,4]);
+
+
+
 difference() {
-    cube([220,28,4]);
+    color("pink")
+    translate([0,6,0])
+    cube([220,16,4]);
     // Mounting holes
     translate([10,14,-1])
     cylinder(h=10,r=2.5);
@@ -126,3 +136,11 @@ difference() {
     cylinder(h=19,r=1.45);
 }
 
+
+/*
+$fn=200;
+color("red")
+translate([110,13,0])    // 126 & 94
+scale([126, 26, 1])
+cylinder(h = 2, r = 1);
+*/
