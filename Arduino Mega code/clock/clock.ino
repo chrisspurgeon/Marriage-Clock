@@ -62,19 +62,18 @@ double hoursLength = 3600.0;
 double daysLength = 86400.0;
 double weeksLength = 604800.0;
 double fortnightsLength = 1209600.0;
-double yearsLength = 31556736.0;
-double decadesLength = 315567360.0;
-double centuriesLength = 3155673600.0;
-unsigned long TIME_OF_MARRIAGE = 1788642000L;      // Saturday, September 5, 2026, at 21:00 UTC
-unsigned long TEST_TIME_OF_MARRIAGE = 674774091L;  // Friday, May 19, 1991, at 21:14:51 UTC
-float CURRENT_MARRIAGE_DURATION;
+double yearsLength = 31536000.0;
+double decadesLength = 315360000.0;
+double centuriesLength = 3153600000.0;
+//unsigned long TIME_OF_MARRIAGE = 1788642000L;      // Saturday, September 5, 2026, at 21:00 UTC
+unsigned long TIME_OF_MARRIAGE = 674774091L;  // Friday, May 19, 1991, at 21:14:51 UTC
+unsigned long CURRENT_MARRIAGE_DURATION_IN_SECONDS;
 unsigned long CURRENT_TIME;
-float DURATION_IN_UNITS;
+double DURATION_IN_UNITS;
 String DURATION_IN_UNITS_string;
 
 /* DEBUGGER */
-bool DEBUGGER_FLAG;
-bool TEST_DATE_FLAG;
+bool DEBUGGER_FLAG = 1;
 
 void setup() {
 
@@ -85,31 +84,10 @@ void setup() {
   // 9600 NMEA is the default baud rate for Adafruit MTK GPS's- some use 4800
   GPS.begin(9600);
 
-  /* DEBUGGING */
-  /* Set digitalpin 7 as the debugger switch. Short the pin to GND to turn on debugging */
-  pinMode(7, INPUT_PULLUP);
-
-  /* Set digitalpin 8 to use Chris and Barb's wedding date. */
-  pinMode(8, INPUT_PULLUP);
-
-  DEBUGGER_FLAG = !digitalRead(7);
-  Serial.print("DEBUGGING PIN IS ");
+  Serial.print("DEBUGGER IS ");
   Serial.println(DEBUGGER_FLAG);
 
-
-  TEST_DATE_FLAG = !digitalRead(8);
-  Serial.print("TEST DATE DEBUGGER PIN IS ");
-  Serial.println(TEST_DATE_FLAG);
-
-
-  if (TEST_DATE_FLAG) {
-    Serial.println("CHECK 1");
-    Serial.println(TIME_OF_MARRIAGE);
-    TIME_OF_MARRIAGE = TEST_TIME_OF_MARRIAGE;
-    Serial.println("CHECK 2");
-    Serial.println(TIME_OF_MARRIAGE);
-  }
-  Serial.println("CHECK 3");
+  Serial.print("Time of marriage is ");
   Serial.println(TIME_OF_MARRIAGE);
 
 
@@ -153,10 +131,6 @@ void setup() {
   display.setBrightness(brightness);  //14
 
   delay(1000);
-  // Ask for firmware version
-  //mySerial.println(PMTK_Q_RELEASE);
-
-
 
   /*
 
@@ -170,7 +144,6 @@ void setup() {
     displayString = textString.substring(i, i + 16);
     brightness = map(analogRead(brightnessPin), 0, 1024, 0, 16);
     speed = map(analogRead(speedPin), 0, 1024, 400, 70);
-    //    Serial.println(brightness);
     display.setBrightness(brightness);  //14
     display.print(displayString);
     delay(speed);
@@ -232,7 +205,6 @@ void loop()  // run over and over again
 {
 
   DEBUGGER_FLAG = !digitalRead(7);
-  Serial.println("HELLO!");
   Serial.print("DEBUGGING PIN IS ");
   Serial.println(DEBUGGER_FLAG);
 
@@ -276,7 +248,9 @@ void loop()  // run over and over again
     currentGPSlock = 0;
     lastGPSlock = 0;
     displayMessage(padding + "WAITING FOR CLOCK SIGNAL" + padding, 1);
-    displayMessage(padding + "THIS MAY TAKE SEVERAL MINUTES" + padding, 1);
+    displayMessage(padding + "THIS MAY TAKE AN HOUR OR EVEN MORE" + padding, 1);
+    displayMessage(padding + "HAVE PATIENCE" + padding, 1);
+    displayMessage(padding + "IF THIS MESSAGE CONTINUES FOR MORE THAN AN HOUR MOVE THE DEVICE CLOSER TO A WINDOW AND TRY AGAIN" + padding, 1);
     delay(2100);
   }
 
@@ -322,6 +296,9 @@ void loop()  // run over and over again
 
     displayMessage(textString, 0);
     delay(4000);
+    CURRENT_TIME = convertToUnixTimeLib(int(GPS.year) + 2000, int(GPS.month), int(GPS.day), int(GPS.hour), int(GPS.minute), int(GPS.seconds));
+
+    timer = millis();  // reset the timer
   }
 
   if (currentGPSlock == 1) {
@@ -330,70 +307,67 @@ void loop()  // run over and over again
       If we're here, we have the correct time and can start the duration displays.
   */
 
-    CURRENT_MARRIAGE_DURATION = CURRENT_TIME - TIME_OF_MARRIAGE;
 
     if (DEBUGGER_FLAG) {
-      Serial.println("HELLO!!!");
-      Serial.println("CURRENT_TIME is ");
+      Serial.println("DEBUGGER IS ON.");
+      Serial.println("The date is " + String(GPS.month) + " / " + String(GPS.day) + " / " + String(GPS.year));
+      Serial.print("CURRENT_TIME is ");
       Serial.println(CURRENT_TIME);
-      Serial.println("TIME_OF_MARRIAGE is ");
+      Serial.print("TIME_OF_MARRIAGE is ");
       Serial.println(TIME_OF_MARRIAGE);
-      Serial.println("CURRENT_MARRIAGE_DURATION is ");
-      Serial.println(CURRENT_MARRIAGE_DURATION);
     }
 
-
-
-    /* WEEKS */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION / weeksLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS);
-    DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " WEEKS" + padding, 1);
-
-    /* DECADES */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION / decadesLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
-    DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " DECADES" + padding, 1);
-
-    /* FORTNIGHTS */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION / fortnightsLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
-    DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " FORTNIGHTS" + padding, 1);
-
-    /* CENTURIES */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION / centuriesLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
-    DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " CENTURIES" + padding, 1);
-
     /* SECONDS */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION / secondsLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS);
-    DURATION_IN_UNITS_string.replace(".00", "");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " SECONDS" + padding, 1);
+    CURRENT_MARRIAGE_DURATION_IN_SECONDS = CURRENT_TIME - TIME_OF_MARRIAGE;
+    if (DEBUGGER_FLAG) {
+      Serial.println("Marriage duration in seconds is " + String(CURRENT_MARRIAGE_DURATION_IN_SECONDS));
+    }
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + String(CURRENT_MARRIAGE_DURATION_IN_SECONDS) + " SECONDS" + padding, 1);
 
     /* MINUTES */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION / minutesLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / minutesLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 0);
     DURATION_IN_UNITS_string.replace(".", "-POINT-");
     displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " MINUTES" + padding, 1);
 
     /* HOURS */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION / hoursLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / hoursLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 2);
     DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " HOURS" + padding, 1); /* MINUTES */
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " HOURS" + padding, 1);
 
     /* DAYS */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION / daysLength;
+    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / daysLength;
     DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
     DURATION_IN_UNITS_string.replace(".", "-POINT-");
     displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " DAYS" + padding, 1);
 
+    /* WEEKS */
+    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / weeksLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS);
+    DURATION_IN_UNITS_string.replace(".", "-POINT-");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " WEEKS" + padding, 1);
+
+    /* FORTNIGHTS */
+    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / fortnightsLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+    DURATION_IN_UNITS_string.replace(".", "-POINT-");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " FORTNIGHTS" + padding, 1);
+
+    /* DECADES */
+    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / decadesLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+    DURATION_IN_UNITS_string.replace(".", "-POINT-");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " DECADES" + padding, 1);
+
+    /* CENTURIES */
+    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / centuriesLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+    DURATION_IN_UNITS_string.replace(".", "-POINT-");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " CENTURIES" + padding, 1);
+
     /* YEARS */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION / yearsLength;
+    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / yearsLength;
     DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
     DURATION_IN_UNITS_string.replace(".", "-POINT-");
     displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " YEARS" + padding, 1);
@@ -449,11 +423,11 @@ void loop()  // run over and over again
 }  // end of loop()
 
 void displayMessage(String theMessage, int scroll) {
+  if (DEBUGGER_FLAG) {
+    Serial.println(textString);
+  }
   if (scroll) {
     textString = theMessage;
-    if (DEBUGGER_FLAG) {
-      Serial.println(textString);
-    }
     textStringLength = textString.length();
     for (int i = 0; i < textStringLength - 15; i++) {
       displayString = textString.substring(i, i + 16);
