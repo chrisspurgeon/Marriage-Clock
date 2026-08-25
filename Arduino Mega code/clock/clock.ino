@@ -73,7 +73,7 @@ double DURATION_IN_UNITS;
 String DURATION_IN_UNITS_string;
 
 /* DEBUGGER */
-bool DEBUGGER_FLAG = 1;
+bool DEBUGGER_FLAG = 0;
 
 void setup() {
 
@@ -143,7 +143,7 @@ void setup() {
   for (int i = 0; i < textStringLength - 15; i++) {
     displayString = textString.substring(i, i + 16);
     brightness = map(analogRead(brightnessPin), 0, 1024, 0, 16);
-    speed = map(analogRead(speedPin), 0, 1024, 400, 70);
+    speed = map(analogRead(speedPin), 0, 1024, 400, 45);
     display.setBrightness(brightness);  //14
     display.print(displayString);
     delay(speed);
@@ -203,13 +203,6 @@ END OF GPS PROCESSING
 
 void loop()  // run over and over again
 {
-
-  DEBUGGER_FLAG = !digitalRead(7);
-  Serial.print("DEBUGGING PIN IS ");
-  Serial.println(DEBUGGER_FLAG);
-
-
-
 
 
   // in case you are not using the interrupt above, you'll
