@@ -65,15 +65,15 @@ double fortnightsLength = 1209600.0;
 double yearsLength = 31536000.0;
 double decadesLength = 315360000.0;
 double centuriesLength = 3153600000.0;
-//unsigned long TIME_OF_MARRIAGE = 1788642000L;      // Saturday, September 5, 2026, at 21:00 UTC
-unsigned long TIME_OF_MARRIAGE = 674774091L;  // Friday, May 19, 1991, at 21:14:51 UTC
+unsigned long TIME_OF_MARRIAGE = 1788642000L;      // Saturday, September 5, 2026, at 21:00 UTC
+//unsigned long TIME_OF_MARRIAGE = 674774091L;  // Friday, May 19, 1991, at 21:14:51 UTC
 unsigned long CURRENT_MARRIAGE_DURATION_IN_SECONDS;
 unsigned long CURRENT_TIME;
 double DURATION_IN_UNITS;
 String DURATION_IN_UNITS_string;
 
 /* DEBUGGER */
-bool DEBUGGER_FLAG = 0;
+bool DEBUGGER_FLAG = 1;
 
 void setup() {
 
@@ -315,56 +315,61 @@ void loop()  // run over and over again
     if (DEBUGGER_FLAG) {
       Serial.println("Marriage duration in seconds is " + String(CURRENT_MARRIAGE_DURATION_IN_SECONDS));
     }
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + String(CURRENT_MARRIAGE_DURATION_IN_SECONDS) + " SECONDS" + padding, 1);
+    if (CURRENT_TIME > TIME_OF_MARRIAGE) {
+      displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + String(CURRENT_MARRIAGE_DURATION_IN_SECONDS) + " SECONDS" + padding, 1);
 
-    /* MINUTES */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / minutesLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 0);
-    DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " MINUTES" + padding, 1);
+      /* MINUTES */
+      DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / minutesLength;
+      DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 0);
+      DURATION_IN_UNITS_string.replace(".", "-POINT-");
+      displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " MINUTES" + padding, 1);
 
-    /* HOURS */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / hoursLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 2);
-    DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " HOURS" + padding, 1);
+      /* HOURS */
+      DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / hoursLength;
+      DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 2);
+      DURATION_IN_UNITS_string.replace(".", "-POINT-");
+      displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " HOURS" + padding, 1);
 
-    /* DAYS */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / daysLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
-    DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " DAYS" + padding, 1);
+      /* DAYS */
+      DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / daysLength;
+      DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+      DURATION_IN_UNITS_string.replace(".", "-POINT-");
+      displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " DAYS" + padding, 1);
 
-    /* WEEKS */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / weeksLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS);
-    DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " WEEKS" + padding, 1);
+      /* WEEKS */
+      DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / weeksLength;
+      DURATION_IN_UNITS_string = String(DURATION_IN_UNITS);
+      DURATION_IN_UNITS_string.replace(".", "-POINT-");
+      displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " WEEKS" + padding, 1);
 
-    /* FORTNIGHTS */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / fortnightsLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
-    DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " FORTNIGHTS" + padding, 1);
+      /* FORTNIGHTS */
+      DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / fortnightsLength;
+      DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+      DURATION_IN_UNITS_string.replace(".", "-POINT-");
+      displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " FORTNIGHTS" + padding, 1);
 
-    /* YEARS */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / yearsLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
-    DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " YEARS" + padding, 1);
+      /* YEARS */
+      DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / yearsLength;
+      DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+      DURATION_IN_UNITS_string.replace(".", "-POINT-");
+      displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " YEARS" + padding, 1);
 
-    /* DECADES */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / decadesLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
-    DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " DECADES" + padding, 1);
+      /* DECADES */
+      DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / decadesLength;
+      DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+      DURATION_IN_UNITS_string.replace(".", "-POINT-");
+      displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " DECADES" + padding, 1);
 
-    /* CENTURIES */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / centuriesLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
-    DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " CENTURIES" + padding, 1);
+      /* CENTURIES */
+      DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / centuriesLength;
+      DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+      DURATION_IN_UNITS_string.replace(".", "-POINT-");
+      displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " CENTURIES" + padding, 1);
 
+
+    } else {
+      displayMessage(padding + "NOT MARRIED YET! COME BACK AFTER THE WEDDING!" + padding, 1);
+    }
   }
 
 
@@ -374,7 +379,7 @@ void loop()  // run over and over again
   if (millis() - timer > 2000) {
     timer = millis();  // reset the timer
     CURRENT_TIME = convertToUnixTimeLib(int(GPS.year) + 2000, int(GPS.month), int(GPS.day), int(GPS.hour), int(GPS.minute), int(GPS.seconds));
-    if (GPSDEBUGGER) {
+    if (DEBUGGER_FLAG) {
       Serial.print("\nThe current time is ");
       Serial.println(CURRENT_TIME);
 
