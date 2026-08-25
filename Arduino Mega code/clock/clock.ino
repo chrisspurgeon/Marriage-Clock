@@ -354,6 +354,12 @@ void loop()  // run over and over again
     DURATION_IN_UNITS_string.replace(".", "-POINT-");
     displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " FORTNIGHTS" + padding, 1);
 
+    /* YEARS */
+    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / yearsLength;
+    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
+    DURATION_IN_UNITS_string.replace(".", "-POINT-");
+    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " YEARS" + padding, 1);
+
     /* DECADES */
     DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / decadesLength;
     DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
@@ -366,11 +372,6 @@ void loop()  // run over and over again
     DURATION_IN_UNITS_string.replace(".", "-POINT-");
     displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " CENTURIES" + padding, 1);
 
-    /* YEARS */
-    DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / yearsLength;
-    DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
-    DURATION_IN_UNITS_string.replace(".", "-POINT-");
-    displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " YEARS" + padding, 1);
   }
 
 
