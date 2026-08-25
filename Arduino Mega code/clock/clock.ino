@@ -66,14 +66,15 @@ double yearsLength = 31536000.0;
 double decadesLength = 315360000.0;
 double centuriesLength = 3153600000.0;
 unsigned long TIME_OF_MARRIAGE = 1788642000L;      // Saturday, September 5, 2026, at 21:00 UTC
-//unsigned long TIME_OF_MARRIAGE = 674774091L;  // Friday, May 19, 1991, at 21:14:51 UTC
+// unsigned long TIME_OF_MARRIAGE = 674774091L;  // Friday, May 19, 1991, at 21:14:51 UTC
 unsigned long CURRENT_MARRIAGE_DURATION_IN_SECONDS;
 unsigned long CURRENT_TIME;
 double DURATION_IN_UNITS;
 String DURATION_IN_UNITS_string;
+float LEAP_YEAR_ADJUSTMENT;
 
 /* DEBUGGER */
-bool DEBUGGER_FLAG = 1;
+bool DEBUGGER_FLAG = 0;
 
 void setup() {
 
@@ -349,19 +350,24 @@ void loop()  // run over and over again
       displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " FORTNIGHTS" + padding, 1);
 
       /* YEARS */
-      DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / yearsLength;
+      LEAP_YEAR_ADJUSTMENT = leapYearCheck(GPS.year, GPS.month);
+      if (DEBUGGER_FLAG) {
+        Serial.print("I think LEAP_YEAR_ADJUSTMENT is ");
+        Serial.println(LEAP_YEAR_ADJUSTMENT, 8);
+      }
+      DURATION_IN_UNITS = (CURRENT_MARRIAGE_DURATION_IN_SECONDS / yearsLength) - LEAP_YEAR_ADJUSTMENT;
       DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
       DURATION_IN_UNITS_string.replace(".", "-POINT-");
       displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " YEARS" + padding, 1);
 
       /* DECADES */
-      DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / decadesLength;
+      DURATION_IN_UNITS = DURATION_IN_UNITS / 10.0000L; // 10 years in a decade
       DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
       DURATION_IN_UNITS_string.replace(".", "-POINT-");
       displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " DECADES" + padding, 1);
 
       /* CENTURIES */
-      DURATION_IN_UNITS = CURRENT_MARRIAGE_DURATION_IN_SECONDS / centuriesLength;
+      DURATION_IN_UNITS = DURATION_IN_UNITS / 10.0000L;  // 10 decades in a century
       DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
       DURATION_IN_UNITS_string.replace(".", "-POINT-");
       displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " CENTURIES" + padding, 1);
@@ -452,4 +458,46 @@ unsigned long convertToUnixTimeLib(int year, int month, int day, int hour, int m
   tm.Minute = minute;
   tm.Second = second;
   return makeTime(tm);  // Returns time_t (Unix timestamp)
+}
+
+float leapYearCheck(int year, int month) {
+  float leapYearAdjustmentFactor = 0.00273224;
+
+  // for debugging
+  if (year == 26 && month == 8) {
+    return 9.0 * leapYearAdjustmentFactor;;
+  }
+
+  if (year >= 28 && month >= 3) {
+    return leapYearAdjustmentFactor;
+  }
+  if (year >= 32 && month >= 3) {
+    return 2.0 * leapYearAdjustmentFactor;
+  }
+  if (year >= 36 && month >= 3) {
+    return 3.0 * leapYearAdjustmentFactor;
+  }
+  if (year >= 40 && month >= 3) {
+    return 4.0 * leapYearAdjustmentFactor;
+  }
+  if (year >= 44 && month >= 3) {
+    return 5.0 * leapYearAdjustmentFactor;
+  }
+  if (year >= 48 && month >= 3) {
+    return 6.0 * leapYearAdjustmentFactor;
+  }
+  if (year >= 52 && month >= 3) {
+    return 7.0 * leapYearAdjustmentFactor;
+  }
+  if (year >= 56 && month >= 3) {
+    return 8.0 * leapYearAdjustmentFactor;
+  }
+  if (year >= 60 && month >= 3) {
+    return 9.0 * leapYearAdjustmentFactor;
+  }
+  if (year >= 64 && month >= 3) {
+    return 10.0 * leapYearAdjustmentFactor;
+  }
+
+  return 0.0;
 }
