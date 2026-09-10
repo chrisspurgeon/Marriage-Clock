@@ -13,10 +13,12 @@ difference() {
     translate([0,6,0])
     cube([220,16,4]);
     // Mounting holes
-    translate([10,14,-1])
+    translate([10,16,-1])
     cylinder(h=10,r=2.5);
-    translate([210,14,-1])
+    translate([210,16,-1])
     cylinder(h=10,r=2.5);
+    translate([200,14,-1])
+    cylinder(h=10,r=1.5);
 }
 
 // 1
