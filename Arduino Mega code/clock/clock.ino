@@ -65,8 +65,11 @@ double fortnightsLength = 1209600.0;
 double yearsLength = 31536000.0;
 double decadesLength = 315360000.0;
 double centuriesLength = 3153600000.0;
-unsigned long TIME_OF_MARRIAGE = 1788642000L;      // Saturday, September 5, 2026, at 21:00 UTC
-// unsigned long TIME_OF_MARRIAGE = 674774091L;  // Friday, May 19, 1991, at 21:14:51 UTC
+
+// Saturday, September 5, 2026, at 17:55:50 EDT converts to Saturday, September 5, 2026, at 21:55:50 UTC
+// Saturday, September 5, 2026, at 21:55:50 UTC converts to 1788645350 unix time
+unsigned long TIME_OF_MARRIAGE = 1788645350L;      // Saturday, September 5, 2026, at 21:55:50 UTC
+
 unsigned long CURRENT_MARRIAGE_DURATION_IN_SECONDS;
 unsigned long CURRENT_TIME;
 double DURATION_IN_UNITS;
