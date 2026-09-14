@@ -68,7 +68,7 @@ double centuriesLength = 3153600000.0;
 
 // Saturday, September 5, 2026, at 17:55:50 EDT converts to Saturday, September 5, 2026, at 21:55:50 UTC
 // Saturday, September 5, 2026, at 21:55:50 UTC converts to 1788645350 unix time
-unsigned long TIME_OF_MARRIAGE = 1788645350L;      // Saturday, September 5, 2026, at 21:55:50 UTC
+unsigned long TIME_OF_MARRIAGE = 1788645350L;  // Saturday, September 5, 2026, at 21:55:50 UTC
 
 unsigned long CURRENT_MARRIAGE_DURATION_IN_SECONDS;
 unsigned long CURRENT_TIME;
@@ -364,7 +364,7 @@ void loop()  // run over and over again
       displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " YEARS" + padding, 1);
 
       /* DECADES */
-      DURATION_IN_UNITS = DURATION_IN_UNITS / 10.0000L; // 10 years in a decade
+      DURATION_IN_UNITS = DURATION_IN_UNITS / 10.0000L;  // 10 years in a decade
       DURATION_IN_UNITS_string = String(DURATION_IN_UNITS, 4);
       DURATION_IN_UNITS_string.replace(".", "-POINT-");
       displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + DURATION_IN_UNITS_string + " DECADES" + padding, 1);
@@ -434,16 +434,21 @@ void displayMessage(String theMessage, int scroll) {
   if (DEBUGGER_FLAG) {
     Serial.println(textString);
   }
+
   if (scroll) {
     textString = theMessage;
     textStringLength = textString.length();
     for (int i = 0; i < textStringLength - 15; i++) {
-      displayString = textString.substring(i, i + 16);
-      brightness = map(analogRead(brightnessPin), 0, 1024, 0, 16);
-      speed = map(analogRead(speedPin), 0, 1024, 400, 70);
-      display.setBrightness(brightness);  //14
-      display.print(displayString);
-      delay(speed);
+      if (analogRead(brightnessPin) > 20) {
+        displayString = textString.substring(i, i + 16);
+        brightness = map(analogRead(brightnessPin), 0, 1024, 0, 16);
+        speed = map(analogRead(speedPin), 0, 1024, 400, 70);
+        display.setBrightness(brightness);  //14
+        display.print(displayString);
+        delay(speed);
+      } else {
+        display.print(padding);
+      }
     }
   } else {
     display.print(theMessage);
@@ -468,7 +473,8 @@ float leapYearCheck(int year, int month) {
 
   // for debugging
   if (year == 26 && month == 8) {
-    return 9.0 * leapYearAdjustmentFactor;;
+    return 9.0 * leapYearAdjustmentFactor;
+    ;
   }
 
   if (year >= 28 && month >= 3) {
