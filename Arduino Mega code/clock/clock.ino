@@ -156,7 +156,7 @@ void setup() {
 
   */
 
-  textString = padding + "MARRIAGE CLOCK" + padding + "DESIGNED AND BUILT IN CALIFORNIA IN AUGUST 2026 BY CHRIS SPURGEON" + padding;
+  textString = padding + "MARRIAGE CLOCK" + padding + "DESIGNED AND BUILT IN CALIFORNIA BY CHRIS SPURGEON" + padding;
   textStringLength = textString.length();
   for (int i = 0; i < textStringLength - 15; i++) {
     displayString = textString.substring(i, i + 16);
@@ -263,6 +263,16 @@ void loop() {  // run over and over again
   if ((int)GPS.fix != 0) {
     current_GPS_status = 1;
   }
+
+  if (DEBUGGER_FLAG) {
+    Serial.print("At the top of loop() RTC_status is ");
+    Serial.print(RTC_status);
+    Serial.print(" and current_GPS_status is ");
+    Serial.println(current_GPS_status);
+  }
+
+
+
 
   // If we don't have a valid time...
   if (RTC_status == 0 && current_GPS_status == 0) {
@@ -509,8 +519,6 @@ void displayMessage(String theMessage, int scroll) {
 
 float leapYearCheck(int year, int month) {
 
-  Serial.print("\n\n\nInside leapYearCheck year is ");
-  Serial.println(year);
   float leapYearAdjustmentFactor = 0.00273224;
 
   if (year >= 2028 && month >= 3) {
