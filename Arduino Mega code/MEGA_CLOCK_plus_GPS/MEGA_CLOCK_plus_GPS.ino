@@ -159,6 +159,28 @@ void setup() {
 
   delay(1000);
 
+
+  /*
+  
+  Let's get the initial reading from the RTC
+
+  */
+
+  RTC_now = rtc.now();  // Read the time and date from the clock chip
+  Serial.println("Initial Real Time Clock reading...");
+  Serial.println("DATE:");
+  Serial.print(RTC_now.month());
+  Serial.print(" / ");
+  Serial.print(RTC_now.day());
+  Serial.print(" / ");
+  Serial.println(RTC_now.year());
+  Serial.println("TIME:");
+  Serial.print(RTC_now.hour());
+  Serial.print(":");
+  Serial.print(RTC_now.minute());
+  Serial.print(":");
+  Serial.println(RTC_now.second());
+
   /*
 
   INITIAL WELCOME DISPLAY
@@ -261,7 +283,7 @@ void loop() {  // run over and over again
   RTC_now = rtc.now();  // Read the time and date from the clock chip
   CURRENT_TIME = (unsigned long)RTC_now.unixtime();
 
-  if (CURRENT_TIME < TIME_OF_MARRIAGE) {
+  if (RTC_now.year() == 2000) {
     RTC_status = 0;
   } else {
     RTC_status = 1;
