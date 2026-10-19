@@ -8,7 +8,7 @@ $fn = 300;
 // BACK PLATE
 difference() {
     scale([126, 26, 1])
-    cylinder(h = 3, r = 1);
+    cylinder(h = 2.5, r = 1);
 
     // Mounting holes
     translate([122.5,0,-1])
@@ -50,13 +50,13 @@ difference() {
 //BOTTOM PLATE
 color("yellow")
 translate([-100,11,0])
-cube([200,4,59]);
+cube([200,4,62]);
 
 //DISPLAY MOUNTING PLATE
 difference() {
     color("gray")
-    translate([-110,-10,58])
-    cube([220,25,3]);
+    translate([-110,-10,60.5])
+    cube([220,25,2.5]);
 
     // Mounting holes
     translate([-100,0,48])
