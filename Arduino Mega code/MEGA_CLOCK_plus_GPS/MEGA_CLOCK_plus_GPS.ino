@@ -6,7 +6,7 @@
 
 #include <TimeLib.h>  // Include the Time library
 
-// GPS wiring
+// GPS WIRING
 // VIN gets 5V
 // TX on the GPS unit goes to RX1 (PIN 19) on the MEGA
 // RX on the GPS unit goes to TX1 (PIN 18) on the MEGA
@@ -16,6 +16,12 @@
 // Red wire goes to 5V
 // Blue wire goes to SDA (PIN 20)
 // Yellow wire goes to SCL (PIN 21)
+
+// CLOCK WIRING
+// VIN gets 5V
+// SDA goes to pin 20
+// SCL goes to pin 21
+
 
 // Create the Real Time Clock object.
 // You may use RTC_DS1307 with the DS3231, DS1337, DS1340, Chronodot
@@ -80,9 +86,12 @@ double yearsLength = 31536000.0;
 double decadesLength = 315360000.0;
 double centuriesLength = 3153600000.0;
 
-
+//Pierrie and Ethan
 // Saturday, September 5, 2026, at 17:55:50 EDT converts to Saturday, September 5, 2026, at 21:55:50 UTC, which converts to 1788645350 unix time
-unsigned long TIME_OF_MARRIAGE = 1788645350L;  // Saturday, September 5, 2026, at 21:55:50 UTC
+
+// Amy and Greg
+// October 10, 1986 at 4:00 pm EDT converts to October 10, 1986 at 20:00 UTC, which converts to 529358400 unix time.
+unsigned long TIME_OF_MARRIAGE = 529358400L;  // Saturday, September 5, 2026, at 21:55:50 UTC
 
 unsigned long CURRENT_MARRIAGE_DURATION_IN_SECONDS;
 unsigned long CURRENT_TIME;
@@ -139,7 +148,7 @@ void setup() {
   //  if (display.begin(0x70) == false)
   //  if (display.begin(0x70, 0x71) == false)
   //  if (display.begin(0x70, 0x71, 0x72) == false)
-  if (display.begin(0x70, 0x71, 0x72, 0x73) == false) {
+  if (display.begin(0x73, 0x72, 0x71, 0x70) == false) {
     Serial.println("Device did not acknowledge! Freezing.");
     while (1)
       ;
