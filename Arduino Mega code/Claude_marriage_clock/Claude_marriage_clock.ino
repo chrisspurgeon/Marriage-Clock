@@ -50,6 +50,12 @@ const int speedPin = A1;             // scroll speed potentiometer
 // October 10, 1986 at 4:00 pm EDT = October 10, 1986 at 20:00 UTC = 529358400 unix time.
 const unsigned long TIME_OF_MARRIAGE = 529358400UL;
 
+// Calendar date of the wedding (UTC). Time of day is taken from TIME_OF_MARRIAGE.
+// These must agree with TIME_OF_MARRIAGE above.
+const int MARRIAGE_YEAR = 1986;
+const int MARRIAGE_MONTH = 10;
+const int MARRIAGE_DAY = 10;
+
 // Any RTC reading earlier than this is treated as invalid (Jan 1, 2026 00:00 UTC).
 const unsigned long EARLIEST_VALID_TIME = 1767225600UL;
 
@@ -58,9 +64,6 @@ const unsigned long HOUR_SECONDS = 3600UL;
 const unsigned long DAY_SECONDS = 86400UL;
 const unsigned long WEEK_SECONDS = 604800UL;
 const unsigned long FORTNIGHT_SECONDS = 1209600UL;
-const unsigned long YEAR_SECONDS = 31536000UL;     // 365 days
-const unsigned long DECADE_SECONDS = 315360000UL;  // 10 x 365 days
-const unsigned long CENTURY_SECONDS = 3153600000UL;  // 100 x 365 days (fits in 32 bits)
 
 uint32_t statsTimer = 0;
 
@@ -103,7 +106,7 @@ void displayMessage(String theMessage, int scroll) {
 // Formats num/den with the given number of decimals using integer math only,
 // writing "-POINT-" for the decimal point. Avoids the 32-bit float precision
 // limit on the Mega.
-String formatFixed(uint32_t num, uint32_t den, uint8_t decimals) {
+String formatFixed(uint64_t num, uint64_t den, uint8_t decimals) {
   String s = String((unsigned long)(num / den));
   if (decimals == 0) return s;
   s += "-POINT-";
@@ -116,45 +119,30 @@ String formatFixed(uint32_t num, uint32_t den, uint8_t decimals) {
   return s;
 }
 
-// Unix time (UTC) of 00:00 on March 1 of the given year.
-// Done by hand because RTClib's DateTime does not handle years before 2000.
-unsigned long unixAtMarch1(int year) {
-  long y = year;
+// Days since 1970-01-01 for a given civil date (proleptic Gregorian).
+long daysFromCivil(long y, int m, int d) {
+  y -= (m <= 2);
   long era = y / 400;
   long yoe = y - era * 400;
-  long doe = yoe * 365 + yoe / 4 - yoe / 100;  // day-of-year offset for March 1 is 0
-  long days = era * 146097L + doe - 719468L;
-  return (unsigned long)days * 86400UL;
+  long doy = (153 * (m > 2 ? m - 3 : m + 9) + 2) / 5 + d - 1;
+  long doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+  return era * 146097L + doe - 719468L;
 }
 
-bool isLeapYear(int y) {
-  return (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);
+// Unix time (UTC) of the wedding anniversary in the given year.
+unsigned long anniversaryUnix(int year) {
+  return (unsigned long)daysFromCivil(year, MARRIAGE_MONTH, MARRIAGE_DAY) * DAY_SECONDS
+         + (TIME_OF_MARRIAGE % DAY_SECONDS);
 }
 
-// Number of Feb 29ths that have fully passed between the wedding and 'now'.
-unsigned long leapDaysSinceWedding(unsigned long nowUnix, int nowYear) {
-  unsigned long count = 0;
-  int startYear = 1969 + (int)(TIME_OF_MARRIAGE / YEAR_SECONDS);  // safely at or before the wedding year
-  for (int y = startYear; y <= nowYear; y++) {
-    if (!isLeapYear(y)) continue;
-    unsigned long t = unixAtMarch1(y);  // Feb 29 is complete at this moment
-    if (t > TIME_OF_MARRIAGE && t <= nowUnix) count++;
-  }
-  return count;
-}
-
-// Reads the clock fresh and scrolls "YOU HAVE BEEN MARRIED FOR <n> <unit>".
-// For years/decades/centuries, leap days are removed so the 40th anniversary
-// reads exactly 40.0000 years (a "year" here is 365 days).
-void showDuration(const char *unitName, unsigned long divisor, uint8_t decimals, bool leapAdjusted) {
+// Reads the clock fresh and scrolls "YOU HAVE BEEN MARRIED FOR <n> <unit>"
+// for fixed-length units (seconds through fortnights).
+void showDuration(const char *unitName, unsigned long divisor, uint8_t decimals) {
   DateTime now = rtc.now();
   unsigned long t = (unsigned long)now.unixtime();
   if (t <= TIME_OF_MARRIAGE) return;
 
   unsigned long elapsed = t - TIME_OF_MARRIAGE;
-  if (leapAdjusted) {
-    elapsed -= leapDaysSinceWedding(t, now.year()) * DAY_SECONDS;
-  }
 
   if (DEBUGGER_FLAG) {
     Serial.print("elapsed (");
@@ -164,6 +152,36 @@ void showDuration(const char *unitName, unsigned long divisor, uint8_t decimals,
   }
 
   displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + formatFixed(elapsed, divisor, decimals) + " " + unitName + padding, 1);
+}
+
+// Calendar-accurate years (or decades/centuries via yearsPerUnit = 1, 10, 100).
+// Whole years are counted by real anniversaries; the fraction is the progress
+// through the current anniversary year, whose length is 365 or 366 days.
+void showCalendarYears(const char *unitName, unsigned long yearsPerUnit, uint8_t decimals) {
+  DateTime now = rtc.now();
+  unsigned long t = (unsigned long)now.unixtime();
+  if (t <= TIME_OF_MARRIAGE) return;
+
+  int whole = now.year() - MARRIAGE_YEAR;
+  if (anniversaryUnix(MARRIAGE_YEAR + whole) > t) whole--;  // anniversary not reached yet this year
+
+  unsigned long last = anniversaryUnix(MARRIAGE_YEAR + whole);
+  unsigned long next = anniversaryUnix(MARRIAGE_YEAR + whole + 1);
+  uint64_t yearLen = next - last;  // 365 or 366 days, in seconds
+
+  uint64_t num = (uint64_t)whole * yearLen + (t - last);  // total years, scaled by yearLen
+  uint64_t den = yearLen * yearsPerUnit;
+
+  if (DEBUGGER_FLAG) {
+    Serial.print("whole years: ");
+    Serial.print(whole);
+    Serial.print("  seconds into year: ");
+    Serial.print(t - last);
+    Serial.print(" of ");
+    Serial.println((unsigned long)yearLen);
+  }
+
+  displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + formatFixed(num, den, decimals) + " " + unitName + padding, 1);
 }
 
 // True if the GPS currently has a fix and a plausible date/time.
@@ -342,15 +360,15 @@ void loop() {
 
   // --- Clock is good: MAIN DISPLAY ---
   if (currentTime > TIME_OF_MARRIAGE) {
-    showDuration("SECONDS", 1UL, 0, false);
-    showDuration("MINUTES", MINUTE_SECONDS, 0, false);
-    showDuration("HOURS", HOUR_SECONDS, 2, false);
-    showDuration("DAYS", DAY_SECONDS, 4, false);
-    showDuration("WEEKS", WEEK_SECONDS, 4, false);
-    showDuration("FORTNIGHTS", FORTNIGHT_SECONDS, 4, false);
-    showDuration("YEARS", YEAR_SECONDS, 4, true);
-    showDuration("DECADES", DECADE_SECONDS, 4, true);
-    showDuration("CENTURIES", CENTURY_SECONDS, 4, true);
+    showDuration("SECONDS", 1UL, 0);
+    showDuration("MINUTES", MINUTE_SECONDS, 0);
+    showDuration("HOURS", HOUR_SECONDS, 2);
+    showDuration("DAYS", DAY_SECONDS, 4);
+    showDuration("WEEKS", WEEK_SECONDS, 4);
+    showDuration("FORTNIGHTS", FORTNIGHT_SECONDS, 4);
+    showCalendarYears("YEARS", 1, 4);
+    showCalendarYears("DECADES", 10, 4);
+    showCalendarYears("CENTURIES", 100, 4);
   } else {
     displayMessage(padding + "NOT MARRIED YET! COME BACK AFTER THE WEDDING!" + padding, 1);
   }
