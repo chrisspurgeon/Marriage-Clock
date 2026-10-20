@@ -350,9 +350,10 @@ void loop() {
       // We have a fix; wait for the next fresh sentence so the time we set is current.
     } else {
       displayMessage(padding + "WAITING FOR CLOCK SIGNAL" + padding, 1);
-      displayMessage(padding + "THIS MAY TAKE AN HOUR OR EVEN MORE" + padding, 1);
+      displayMessage(padding + "IF THIS MESSAGE PERSISTS REPLACE THE INTERNAL CLOCK BATTERY AND THEN RUN THE CLOCK WHERE IT CAN GET A CLEAR GPS SIGNAL" + padding, 1);
+      displayMessage(padding + "THIS MAY TAKE 15 MINUTES OR EVEN MORE" + padding, 1);
       displayMessage(padding + "HAVE PATIENCE" + padding, 1);
-      displayMessage(padding + "IF THIS MESSAGE CONTINUES FOR MORE THAN AN HOUR MOVE THE DEVICE CLOSER TO A WINDOW AND TRY AGAIN" + padding, 1);
+      displayMessage(padding + "ONCE IT STARTS DISPLAYING MARRIAGE DURATIONS AGAIN ITS OK" + padding, 1);
       delay(2100);
     }
     return;
