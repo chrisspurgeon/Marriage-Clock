@@ -91,7 +91,7 @@ double centuriesLength = 3153600000.0;
 
 // Amy and Greg
 // October 10, 1986 at 4:00 pm EDT converts to October 10, 1986 at 20:00 UTC, which converts to 529358400 unix time.
-unsigned long TIME_OF_MARRIAGE = 529358400L;  // Saturday, September 5, 2026, at 21:55:50 UTC
+unsigned long TIME_OF_MARRIAGE = 529358400L;  // October 10, 1986 at 4:00 pm EDT
 
 unsigned long CURRENT_MARRIAGE_DURATION_IN_SECONDS;
 unsigned long CURRENT_TIME;
