@@ -119,6 +119,25 @@ String formatFixed(uint64_t num, uint64_t den, uint8_t decimals) {
   return s;
 }
 
+// Formats a whole number in easy-to-read chunks, e.g.
+// 1234567 -> "1-MILLION 234-THOUSAND 567". Zero-valued chunks are skipped.
+String formatWithWords(unsigned long n) {
+  if (n == 0) return "0";
+  const char *names[4] = { "", "-THOUSAND", "-MILLION", "-BILLION" };
+  unsigned int groups[4];
+  for (int i = 0; i < 4; i++) {
+    groups[i] = (unsigned int)(n % 1000UL);
+    n /= 1000UL;
+  }
+  String s = "";
+  for (int i = 3; i >= 0; i--) {
+    if (groups[i] == 0) continue;
+    if (s.length() > 0) s += " ";
+    s += String(groups[i]) + names[i];
+  }
+  return s;
+}
+
 // Days since 1970-01-01 for a given civil date (proleptic Gregorian).
 long daysFromCivil(long y, int m, int d) {
   y -= (m <= 2);
@@ -137,7 +156,9 @@ unsigned long anniversaryUnix(int year) {
 
 // Reads the clock fresh and scrolls "YOU HAVE BEEN MARRIED FOR <n> <unit>"
 // for fixed-length units (seconds through fortnights).
-void showDuration(const char *unitName, unsigned long divisor, uint8_t decimals) {
+// If useWords is true, the whole-number count is spelled out in chunks
+// (e.g. "1-MILLION 234-THOUSAND 567"); decimals is ignored in that case.
+void showDuration(const char *unitName, unsigned long divisor, uint8_t decimals, bool useWords) {
   DateTime now = rtc.now();
   unsigned long t = (unsigned long)now.unixtime();
   if (t <= TIME_OF_MARRIAGE) return;
@@ -151,7 +172,10 @@ void showDuration(const char *unitName, unsigned long divisor, uint8_t decimals)
     Serial.println(elapsed);
   }
 
-  displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + formatFixed(elapsed, divisor, decimals) + " " + unitName + padding, 1);
+  String amount = useWords ? formatWithWords(elapsed / divisor)
+                           : formatFixed(elapsed, divisor, decimals);
+
+  displayMessage(padding + "YOU HAVE BEEN MARRIED FOR " + amount + " " + unitName + padding, 1);
 }
 
 // Calendar-accurate years (or decades/centuries via yearsPerUnit = 1, 10, 100).
@@ -361,12 +385,12 @@ void loop() {
 
   // --- Clock is good: MAIN DISPLAY ---
   if (currentTime > TIME_OF_MARRIAGE) {
-    showDuration("SECONDS", 1UL, 0);
-    showDuration("MINUTES", MINUTE_SECONDS, 0);
-    showDuration("HOURS", HOUR_SECONDS, 2);
-    showDuration("DAYS", DAY_SECONDS, 4);
-    showDuration("WEEKS", WEEK_SECONDS, 4);
-    showDuration("FORTNIGHTS", FORTNIGHT_SECONDS, 4);
+    showDuration("SECONDS", 1UL, 0, true);
+    showDuration("MINUTES", MINUTE_SECONDS, 0, true);
+    showDuration("HOURS", HOUR_SECONDS, 2, false);
+    showDuration("DAYS", DAY_SECONDS, 4, false);
+    showDuration("WEEKS", WEEK_SECONDS, 4, false);
+    showDuration("FORTNIGHTS", FORTNIGHT_SECONDS, 4, false);
     showCalendarYears("YEARS", 1, 4);
     showCalendarYears("DECADES", 10, 4);
     showCalendarYears("CENTURIES", 100, 4);
